@@ -324,7 +324,12 @@ if(UNIX)
   else()
     message(STATUS "Debug symbols         : Disabled")
   endif()
-  
+
+  if(APPLE)
+    # Disable Mac OS assert macros
+    set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -D__ASSERTMACROS__")
+  endif()
+
   if(GCC_SANITIZE)
     set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -fno-omit-frame-pointer -fno-optimize-sibling-calls")
     set(BUILD_ADDITIONAL_FLAGS "${BUILD_ADDITIONAL_FLAGS} -fsanitize=address")

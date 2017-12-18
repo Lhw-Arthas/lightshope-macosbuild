@@ -126,7 +126,11 @@ typedef ACE_INT64 int64;
 typedef ACE_INT32 int32;
 typedef ACE_INT16 int16;
 typedef ACE_INT8 int8;
+//Mac OS X hack against uint64 redefine
+#ifndef _UINT64
 typedef ACE_UINT64 uint64;
+#define _UINT64
+#endif
 typedef ACE_UINT32 uint32;
 typedef ACE_UINT16 uint16;
 typedef ACE_UINT8 uint8;
