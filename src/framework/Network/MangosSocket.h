@@ -1,6 +1,10 @@
 #ifndef MANGOSSOCKET_H
 #define MANGOSSOCKET_H
 
+#if defined(__APPLE__)
+#undef dispatch_notify
+#endif
+
 #include <ace/Basic_Types.h>
 #include <ace/Synch_Traits.h>
 #include <ace/Svc_Handler.h>
