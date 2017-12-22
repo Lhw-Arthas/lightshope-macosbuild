@@ -10484,6 +10484,14 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
         pItem->SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid());
         pItem->SetSlot(NULL_SLOT);
         pItem->SetState(ITEM_REMOVED, this);
+
+        // If destroying a charter, destroy the petition too
+        if (pItem->IsCharter())
+        {
+            uint32 petitionId = pItem->GetEnchantmentId(EnchantmentSlot(0));
+            if (Petition* petition = sGuildMgr.GetPetitionById(petitionId))
+                sGuildMgr.DeletePetition(petition);
+        }
     }
 }
 
@@ -11851,23 +11859,32 @@ void Player::PrepareGossipMenu(WorldObject *pSource, uint32 menuId)
 
         if (hasMenuItem)
         {
-            std::string strOptionText = itr->second.option_text;
-            std::string strBoxText = itr->second.box_text;
-
+            std::string strOptionText, strBoxText;
             int loc_idx = GetSession()->GetSessionDbLocaleIndex();
+
+            if (itr->second.OptionBroadcastTextID)
+                strOptionText = sObjectMgr.GetBroadcastTextLocale(itr->second.OptionBroadcastTextID)->GetText(loc_idx, getGender(), false);
+            else
+                strOptionText = itr->second.option_text;
+
+            if (itr->second.BoxBroadcastTextID)
+                strBoxText = sObjectMgr.GetBroadcastTextLocale(itr->second.BoxBroadcastTextID)->GetText(loc_idx, getGender(), false);
+            else
+                strBoxText = itr->second.box_text;
 
             if (loc_idx >= 0)
             {
                 uint32 idxEntry = MAKE_PAIR32(menuId, itr->second.id);
 
-                if (GossipMenuItemsLocale const *no = sObjectMgr.GetGossipMenuItemsLocale(idxEntry))
-                {
-                    if (no->OptionText.size() > (size_t)loc_idx && !no->OptionText[loc_idx].empty())
-                        strOptionText = no->OptionText[loc_idx];
+                if (!itr->second.OptionBroadcastTextID)
+                    if (GossipMenuItemsLocale const *no = sObjectMgr.GetGossipMenuItemsLocale(idxEntry))
+                        if (no->OptionText.size() > (size_t)loc_idx && !no->OptionText[loc_idx].empty())
+                            strOptionText = no->OptionText[loc_idx];
 
-                    if (no->BoxText.size() > (size_t)loc_idx && !no->BoxText[loc_idx].empty())
-                        strBoxText = no->BoxText[loc_idx];
-                }
+                if (!itr->second.BoxBroadcastTextID)
+                    if (GossipMenuItemsLocale const *no = sObjectMgr.GetGossipMenuItemsLocale(idxEntry))
+                        if (no->BoxText.size() > (size_t)loc_idx && !no->BoxText[loc_idx].empty())
+                            strBoxText = no->BoxText[loc_idx];
             }
 
             if (isGMSkipConditionCheck)
