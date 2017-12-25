@@ -5390,9 +5390,9 @@ void ChatHandler::SendBanResult(BanMode mode, BanReturn result, std::string& ban
     {
         case BAN_SUCCESS:
             if (duration_secs > 0)
-                PSendSysMessage(LANG_BAN_YOUBANNED, banTarget.c_str(), secsToTimeString(duration_secs, true).c_str(), reason);
+                PSendSysMessage(LANG_BAN_YOUBANNED, banTarget.c_str(), secsToTimeString(duration_secs, true).c_str(), reason.c_str());
             else
-                PSendSysMessage(LANG_BAN_YOUPERMBANNED, banTarget.c_str(), reason);
+                PSendSysMessage(LANG_BAN_YOUPERMBANNED, banTarget.c_str(), reason.c_str());
             break;
         case BAN_SYNTAX_ERROR:
             return;
