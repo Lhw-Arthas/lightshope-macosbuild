@@ -3271,8 +3271,13 @@ float Unit::GetUnitParryChance() const
     }
     else if (GetTypeId() == TYPEID_UNIT)
     {
-        chance = 5.0f;
-        chance += GetTotalAuraModifier(SPELL_AURA_MOD_PARRY_PERCENT);
+        // Can't really know for sure, but Totems probably shouldn't parry.
+        // They are inanimate objects, have no arms nor weapons, and cannot move.
+        if (GetCreatureType() != CREATURE_TYPE_TOTEM)
+        {
+            chance = 5.0f;
+            chance += GetTotalAuraModifier(SPELL_AURA_MOD_PARRY_PERCENT);
+        }
     }
 
     return chance > 0.0f ? chance : 0.0f;
@@ -8602,6 +8607,11 @@ bool Unit::HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, f
             UpdateDamagePhysical(OFF_ATTACK);
             break;
         case UNIT_MOD_DAMAGE_RANGED:
+            UpdateDamagePhysical(RANGED_ATTACK);
+            break;
+        case UNIT_MOD_DAMAGE_PHYSICAL:
+            UpdateDamagePhysical(BASE_ATTACK);
+            UpdateDamagePhysical(OFF_ATTACK);
             UpdateDamagePhysical(RANGED_ATTACK);
             break;
 
