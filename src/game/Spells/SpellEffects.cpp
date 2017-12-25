@@ -4453,14 +4453,14 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     bool gender = unitTarget->getGender();
                     uint32 spellId = 0;
                     uint32 spells[8] = { 
-                        gender == GENDER_MALE ? 24708 : 24709,   // Pirate
-                        gender == GENDER_MALE ? 24711 : 24710,   // Ninja
-                        gender == GENDER_MALE ? 24712 : 24713,   // Leper
-                        gender == GENDER_MALE ? 24735 : 24736,   // Ghost
-                        24723,                                   // Skeleton
-                        24732,                                   // Bat
-                        24740,                                   // Wisp
-                        24753                                    // Critter
+                        gender == GENDER_MALE ? 24708u : 24709u,   // Pirate
+                        gender == GENDER_MALE ? 24711u : 24710u,   // Ninja
+                        gender == GENDER_MALE ? 24712u : 24713u,   // Leper
+                        gender == GENDER_MALE ? 24735u : 24736u,   // Ghost
+                        24723u,                                   // Skeleton
+                        24732u,                                   // Bat
+                        24740u,                                   // Wisp
+                        24753u                                    // Critter
                     };
 
                     spellId = spells[urand(0, 7)];
