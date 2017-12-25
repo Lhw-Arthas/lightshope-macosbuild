@@ -6,10 +6,11 @@ os:
   - osx
 
 before_script:
-  brew install ace
-  brew install mysql
-  brew install openssl
-  brew install tbb
+
+  - brew install ace
+  - brew install mysql
+  - brew install openssl
+  - brew install tbb
 
   - mkdir build
   - cd build
