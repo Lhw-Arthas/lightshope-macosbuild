@@ -35,6 +35,7 @@ ScriptVector m_scripts;
 ScriptMapMap sQuestEndScripts;
 ScriptMapMap sQuestStartScripts;
 ScriptMapMap sSpellScripts;
+ScriptMapMap sCreatureSpellScripts;
 ScriptMapMap sGameObjectScripts;
 ScriptMapMap sEventScripts;
 ScriptMapMap sGossipScripts;
@@ -337,7 +338,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                                     tablename, tmp.castSpell.spellId, tmp.id);
                     continue;
                 }
-                if (tmp.castSpell.flags & ~0x7)             // 3 bits
+                if (tmp.castSpell.flags & ~0xF)             // 3 bits
                 {
                     sLog.outErrorDb("Table `%s` using unknown flags in datalong2 (%u)i n SCRIPT_COMMAND_CAST_SPELL for script id %u",
                                     tablename, tmp.castSpell.flags, tmp.id);
@@ -777,6 +778,13 @@ void ScriptMgr::LoadEventScripts()
     }
 }
 
+void ScriptMgr::LoadCreatureSpellScripts()
+{
+    LoadScripts(sCreatureSpellScripts, "creature_spells_scripts");
+
+    // checks are done in LoadCreatureSpells
+}
+
 void ScriptMgr::LoadGossipScripts()
 {
     LoadScripts(sGossipScripts, "gossip_scripts");
@@ -791,11 +799,12 @@ void ScriptMgr::LoadCreatureMovementScripts()
     // checks are done in WaypointManager::Load
 }
 
-void ScriptMgr::LoadDbScriptStrings()
+void ScriptMgr::CheckAllScriptTexts()
 {
     CheckScriptTexts(sQuestEndScripts);
     CheckScriptTexts(sQuestStartScripts);
     CheckScriptTexts(sSpellScripts);
+    CheckScriptTexts(sCreatureSpellScripts);
     CheckScriptTexts(sGameObjectScripts);
     CheckScriptTexts(sEventScripts);
     CheckScriptTexts(sGossipScripts);

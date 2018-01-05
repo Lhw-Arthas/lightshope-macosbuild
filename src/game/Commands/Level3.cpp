@@ -138,8 +138,9 @@ bool ChatHandler::HandleReloadAllScriptsCommand(char* /*args*/)
     HandleReloadQuestEndScriptsCommand((char*)"a");
     HandleReloadQuestStartScriptsCommand((char*)"a");
     HandleReloadSpellScriptsCommand((char*)"a");
+    HandleReloadCreatureSpellScriptsCommand((char*)"a");
     SendSysMessage("DB tables `*_scripts` reloaded.");
-    HandleReloadDbScriptStringCommand((char*)"a");
+    sScriptMgr.CheckAllScriptTexts();
     return true;
 }
 
@@ -229,6 +230,14 @@ bool ChatHandler::HandleReloadCommandCommand(char* /*args*/)
 {
     load_command_table = true;
     SendSysMessage("DB table `command` will be reloaded at next chat command use.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadCreatureSpellsCommand(char* /*args*/)
+{
+    sLog.outString("Re-Loading Creature Spells... (`creature_spells`)");
+    sObjectMgr.LoadCreatureSpells();
+    SendSysMessage("DB table `creature_spells` reloaded.");
     return true;
 }
 
@@ -755,6 +764,26 @@ bool ChatHandler::HandleReloadQuestStartScriptsCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleReloadCreatureSpellScriptsCommand(char* args)
+{
+    if (sScriptMgr.IsScriptScheduled())
+    {
+        SendSysMessage("DB scripts used currently, please attempt reload later.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (*args != 'a')
+        sLog.outString("Re-Loading Scripts from `creature_spells_scripts`...");
+
+    sScriptMgr.LoadCreatureSpellScripts();
+
+    if (*args != 'a')
+        SendSysMessage("DB table `creature_spells_scripts` reloaded.");
+
+    return true;
+}
+
 bool ChatHandler::HandleReloadSpellScriptsCommand(char* args)
 {
     if (sScriptMgr.IsScriptScheduled())
@@ -772,14 +801,6 @@ bool ChatHandler::HandleReloadSpellScriptsCommand(char* args)
     if (*args != 'a')
         SendSysMessage("DB table `spell_scripts` reloaded.");
 
-    return true;
-}
-
-bool ChatHandler::HandleReloadDbScriptStringCommand(char* /*args*/)
-{
-    sLog.outString("Re-Loading Script strings from `db_script_string`...");
-    sScriptMgr.LoadDbScriptStrings();
-    SendSysMessage("DB table `db_script_string` reloaded.");
     return true;
 }
 

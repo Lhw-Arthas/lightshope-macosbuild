@@ -285,7 +285,6 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket & recv_data)
     DEBUG_LOG("Received opcode CMSG_PETITION_SIGN");    // ok
     //recv_data.hexlike();
 
-    Field *fields;
     ObjectGuid itemGuid;
     uint8 unk;
     recv_data >> itemGuid;                              // item guid
@@ -340,7 +339,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket & recv_data)
 
     //client doesn't allow to sign petition two times by one character, but not check sign by another character from same account
     //not allow sign another player from already sign player account
-    if (petition->GetSignatureForPlayer(_player))
+    if (PetitionSignature* signature = petition->GetSignatureForPlayer(_player))
     {
         WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
         data << ObjectGuid(itemGuid);
@@ -518,9 +517,6 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
 
     // OK!
 
-    // delete charter item
-    _player->DestroyItem(charter->GetBagSlot(), charter->GetSlot(), true);
-
     // signs
     uint8 signs = petition->GetSignatureCount();
 
@@ -536,6 +532,12 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
 
     sGuildMgr.DeletePetition(petition);
     petition = nullptr; // deleted in GuildMgr::DeletePetition
+
+    // Delete the charter item now. Deleting the charter deletes the petition
+    // if it still exists, so we do not want to do it before the guild is
+    // created.
+    _player->DestroyItem(charter->GetBagSlot(), charter->GetSlot(), true);
+
     // created
     DEBUG_LOG("TURN IN PETITION %u", petitionguid);
 

@@ -121,9 +121,6 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
     //Teleports a player without dropping threat (only teleports to same map)
     void DoTeleportPlayer(Unit* pUnit, float fX, float fY, float fZ, float fO);
 
-    //Returns friendly unit with the most amount of hp missing from max hp
-    Unit* DoSelectLowestHpFriendly(float fRange, uint32 uiMinHPDiff = 1, bool bPercent = false) const;
-
     //Returns a list of friendly CC'd units within range
     std::list<Creature*> DoFindFriendlyCC(float fRange);
 
@@ -141,9 +138,6 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
 
     //Returns spells that meet the specified criteria from the creatures spell list
     SpellEntry const* SelectSpell(Unit* pTarget, int32 uiSchool, int32 uiMechanic, SelectTarget selectTargets, uint32 uiPowerCostMin, uint32 uiPowerCostMax, float fRangeMin, float fRangeMax, SelectEffect selectEffect);
-
-    //Checks if you can cast the specified spell
-    bool CanCast(Unit* pTarget, SpellEntry const* pSpell, bool bTriggered = false);
 
     void SetEquipmentSlots(bool bLoadDefault, int32 uiMainHand = EQUIP_NO_CHANGE, int32 uiOffHand = EQUIP_NO_CHANGE, int32 uiRanged = EQUIP_NO_CHANGE);
 

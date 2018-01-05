@@ -79,6 +79,10 @@ void ScriptedAI::UpdateAI(const uint32 uiDiff)
 {
     //Check if we have a current target
     m_creature->SelectHostileTarget();
+
+    if (!m_CreatureSpells.empty() && m_creature->isInCombat())
+        DoSpellTemplateCasts(uiDiff);
+
     DoMeleeAttackIfReady();
 }
 
@@ -93,6 +97,9 @@ void ScriptedAI::EnterEvadeMode()
         m_creature->GetMotionMaster()->MoveTargetedHome();
 
     m_creature->SetLootRecipient(nullptr);
+
+    // Reset back to default spells template. This also resets timers.
+    SetSpellsTemplate(m_creature->GetCreatureInfo()->spells_template);
 
     Reset();
 }
@@ -247,33 +254,6 @@ SpellEntry const* ScriptedAI::SelectSpell(Unit* pTarget, int32 uiSchool, int32 u
     return apSpell[rand()%uiSpellCount];
 }
 
-bool ScriptedAI::CanCast(Unit* pTarget, SpellEntry const* pSpellEntry, bool bTriggered)
-{
-    //No target so we can't cast
-    if (!pTarget || !pSpellEntry)
-        return false;
-
-    //Silenced so we can't cast
-    if (!bTriggered && m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
-        return false;
-
-    //Check for power
-    if (!bTriggered && m_creature->GetPower((Powers)pSpellEntry->powerType) < pSpellEntry->manaCost)
-        return false;
-
-    SpellRangeEntry const* pTempRange = GetSpellRangeStore()->LookupEntry(pSpellEntry->rangeIndex);
-
-    //Spell has invalid range store so we can't use it
-    if (!pTempRange)
-        return false;
-
-    //Unit is out of range of this spell
-    if (!m_creature->IsInRange(pTarget, pTempRange->minRange, pTempRange->maxRange))
-        return false;
-
-    return true;
-}
-
 void ScriptedAI::DoResetThreat()
 {
     if (!m_creature->CanHaveThreatList() || m_creature->getThreatManager().isThreatListEmpty())
@@ -303,18 +283,6 @@ void ScriptedAI::DoTeleportPlayer(Unit* pUnit, float fX, float fY, float fZ, flo
     }
 
     ((Player*)pUnit)->TeleportTo(pUnit->GetMapId(), fX, fY, fZ, fO, TELE_TO_NOT_LEAVE_COMBAT);
-}
-
-Unit* ScriptedAI::DoSelectLowestHpFriendly(float fRange, uint32 uiMinHPDiff, bool bPercent) const
-{
-    Unit* pUnit = nullptr;
-
-    MaNGOS::MostHPMissingInRangeCheck u_check(m_creature, fRange, uiMinHPDiff, bPercent);
-    MaNGOS::UnitLastSearcher<MaNGOS::MostHPMissingInRangeCheck> searcher(pUnit, u_check);
-
-    Cell::VisitGridObjects(m_creature, searcher, fRange);
-
-    return pUnit;
 }
 
 std::list<Creature*> ScriptedAI::DoFindFriendlyCC(float fRange)
